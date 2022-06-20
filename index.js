@@ -118,17 +118,17 @@ const filterProduct = () => {
 				check.push(true);
 				if (check.length == inputKeys.length) {
 					result.push(`
-                    <td>${value.name}</td>
-                    <td>${value.sku}</td>
-                    <td><img src="${value.preview}" alt="${value.name}" width="75px"></td>
-                    <td>${value.category}</td>
-                    <td>${value.stock}</td>
-                    <td>IDR. ${parseInt(value.price).toLocaleString("id")}</td>
-                    <td>${value.expired ? value.expired : ""}</td>
-					<td>
-					<button type="button" onclick="editData(${value.sku})">Edit</button>
-					<button type="button" onclick="deleteData('${value.sku}')">Delete</button>
-					</td>`);
+						<td>${value.name}</td>
+						<td>${value.sku}</td>
+						<td><img src="${value.preview}" alt="${value.name}" width="75px"></td>
+						<td>${value.category}</td>
+						<td>${value.stock}</td>
+						<td>IDR. ${parseInt(value.price).toLocaleString("id")}</td>
+						<td>${value.expired ? value.expired : ""}</td>
+						<td>
+						<button type="button" onclick="editData('${value.sku}')">Edit</button>
+						<button type="button" onclick="deleteData('${value.sku}')">Delete</button>
+						</td>`);
 				}
 			}
 		});
@@ -151,16 +151,15 @@ const resetFilter = () => {
 };
 
 const deleteData = (sku) => {
-	let index = warehouse.findIndex( val => val.sku == sku);
+	let index = warehouse.findIndex((val) => val.sku == sku);
 	warehouse.splice(index, 1);
 	getFormValue();
 };
 
 const editData = (sku) => {
 	document.getElementById("list-data").innerHTML = "";
-	let index = warehouse.findIndex( val => val.sku == sku);
+	let index = warehouse.findIndex((val) => val.sku == sku);
 
-	
 	warehouse.forEach((v, i) => {
 		v.category == "General" ? (v.expired = "-") : v.expired;
 		v.expired == "" ? "-" : v.expired;
@@ -178,7 +177,7 @@ const editData = (sku) => {
 				<td>
 				<button type="button" onclick="saveEdit('${v.sku}')">Save</button>
 				<button type="button" onclick="getFormValue()">Cancel</button>
-				</td>`
+				</td>`;
 		} else {
 			document.getElementById("list-data").innerHTML += `
 				<td>${i + 1}.</td>
@@ -194,13 +193,13 @@ const editData = (sku) => {
 				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
 				</td>`;
 		}
-	})
+	});
 };
 
 const saveEdit = (sku) => {
-	let index = warehouse.findIndex( val => val.sku == sku);
-	document.getElementById("edit-name").value == "" ? "" : warehouse[index].name = document.getElementById("edit-name").value;
-	document.getElementById("edit-stock").value == "" ? "" : warehouse[index].stock = document.getElementById("edit-stock").value;
-	document.getElementById("edit-price").value == "" ? "" : warehouse[index].price = document.getElementById("edit-price").value;
+	let index = warehouse.findIndex((val) => val.sku == sku);
+	document.getElementById("edit-name").value == "" ? "" : (warehouse[index].name = document.getElementById("edit-name").value);
+	document.getElementById("edit-stock").value == "" ? "" : (warehouse[index].stock = document.getElementById("edit-stock").value);
+	document.getElementById("edit-price").value == "" ? "" : (warehouse[index].price = document.getElementById("edit-price").value);
 	getFormValue();
-}
+};
