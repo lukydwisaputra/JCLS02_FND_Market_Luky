@@ -38,7 +38,7 @@
             <form id="filter">
                 <input id="fil_name" type="text" placeholder="Product Name">
                 <input id="fil_sku" type="text" placeholder="SKU">
-                <input id="fil_price" type="text" placeholder="Harga">
+                <input id="fil_price" type="number" placeholder="Harga">
                 <select id="fil_category">
                     <option value="" selected>Choose Category</option>
                     <option id="General" value="General">General</option>
@@ -65,7 +65,28 @@
             </thead>
             <tbody id="list-data">
             </tbody>
-        </table>
+        </table><br>
+
+        <fieldset>
+            <legend><strong>Cart List</strong></legend>
+            <button type="button" onclick="clearCart()">Clear Cart</button><br><br>
+            <table>
+                <thead>
+                    <tr>
+                         <th>No.</th>
+                         <th>SKU</th>
+                         <th>Preview</th>
+                         <th>Product Name</th>
+                         <th>Price</th>
+                         <th>Quantity</th>
+                         <th>Sub. Total</th>
+                         <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-list">
+                </tbody>
+            </table>
+        </fieldset>
 
     </div>
 </body>

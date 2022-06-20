@@ -59,6 +59,7 @@ const getFormValue = (data, sku) => {
 				<td>
 				<button type="button" onclick="editData('${v.sku}')">Edit</button>
 				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
+				<button type="button" onclick="buyProduct('${v.sku}')">Beli</button>
 				</td>
 			<tr>`;
 			}
@@ -123,7 +124,7 @@ const filterProduct = () => {
 	console.log(inputValues);
 
 	let result = [];
-	warehouse.forEach((value, index) => {
+	warehouse.forEach((value) => {
 		let check = [];
 		inputKeys.forEach((v, i) => {
 			if (value[inputKeys[i]] == inputValues[i]) {
@@ -163,4 +164,95 @@ const saveEdit = (sku) => {
 	document.getElementById("edit-stock").value == "" ? "" : (warehouse[index].stock = document.getElementById("edit-stock").value);
 	document.getElementById("edit-price").value == "" ? "" : (warehouse[index].price = document.getElementById("edit-price").value);
 	getFormValue(warehouse);
+};
+
+class Cart {
+	constructor(name, sku, preview, price, quantity) {
+		this.sku = sku;
+		this.preview = preview;
+		this.name = name;
+		this.price = price;
+		this.quantity = quantity;
+		this.subtotal = this.price * this.quantity;
+	}
+}
+
+let cartList = [];
+
+const decr = (sku) => {
+	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
+	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+
+	if (cartList[cartListIndex].quantity > 0) {
+		cartList[cartListIndex].quantity -= 1;
+		warehouse[warehouseIndex].stock += 1;
+		getFormValue(warehouse);
+		displayCartList();
+	} else {
+		alert(`Quantity anda kosong!`);
+	}
+};
+
+const incr = (sku) => {
+	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
+	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+
+	if (warehouse[warehouseIndex].stock > 0) {
+		cartList[cartListIndex].quantity += 1;
+		warehouse[warehouseIndex].stock -= 1;
+
+		getFormValue(warehouse);
+		displayCartList();
+	} else {
+		alert(`Stock ${warehouse[warehouseIndex].name} tidak cukup!`);
+	}
+};
+
+const buyProduct = (sku) => {
+	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
+	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+
+	let isEmptyCart = cartList.length == 0;
+	console.log(sku);
+
+	if (isEmptyCart || cartListIndex == -1) {
+		cartList.push(new Cart(warehouse[warehouseIndex].name, warehouse[warehouseIndex].sku, warehouse[warehouseIndex].preview, warehouse[warehouseIndex].price, 1));
+		warehouse[warehouseIndex].stock -= 1;
+		getFormValue(warehouse);
+		displayCartList();
+	} else if (cartListIndex != -1) {
+		incr(sku);
+	}
+};
+
+const displayCartList = () => {
+	document.getElementById("cart-list").innerHTML = cartList
+		.map((v, i) => {
+			return `
+		<tr>
+			<td>${i + 1}.</td>
+			<td>${v.sku}</td>
+			<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
+			<td>${v.name}</td>
+			<td>IDR. ${parseInt(v.price).toLocaleString("id")}</td>
+			<td><button type="button" onclick="decr('${v.sku}')">-</button> ${v.quantity} <button type="button" onclick="incr('${v.sku}')">+</button></td>
+			<td>IDR. ${(parseInt(v.price) * parseInt(v.quantity)).toLocaleString("id")} </td>
+			<td>
+			<button type="button" onclick="">Delete</button> 
+			</td>
+		<tr>`;
+		})
+		.join("");
+};
+
+const clearCart = () => {
+	cartList.forEach((v,i) => {
+		let quantity = v.quantity;
+		while (quantity > 0) {
+			decr(v.sku);
+			quantity -= 1;
+		}
+	})
+	cartList = [];
+	displayCartList();
 };
