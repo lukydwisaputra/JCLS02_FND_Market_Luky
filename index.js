@@ -67,6 +67,8 @@ const getFormValue = (data, sku) => {
 		.join("");
 };
 
+getFormValue(warehouse);
+
 const handleSubmit = () => {
 	let form = document.getElementById("data-form");
 	console.log(id);
