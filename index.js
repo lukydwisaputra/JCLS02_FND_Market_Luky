@@ -23,35 +23,45 @@ warehouse.push(new General("Topi", "SKU-1-456789", "https://www.jakartanotebook.
 warehouse.push(new FnB("Jus Kemasan", "SKU-2-123456", "https://img.my-best.id/press_component/images/22e63af38d2b1403aa0d7a78952107c8.jpg?ixlib=rails-4.2.0&q=70&lossless=0&w=690&fit=max", "FnB", 20, 15000, "2023-08-19"));
 warehouse.push(new FnB("Tomat", "SKU-3-123456", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/800px-Tomato_je.jpg", "FnB", 100, 750, "2022-07-24"));
 
-const getFormValue = () => {
-	document.getElementById("list-data").innerHTML = "";
+const getFormValue = (data, sku) => {
+	document.getElementById("list-data").innerHTML = data.map((v, i) => {
+		v.category == "General" ? (v.expired = "-") : v.expired;
+		v.expired == "" ? "-" : v.expired;
 
-	warehouse.forEach((value, index) => {
-		let name = value.name;
-		let sku = value.sku;
-		let preview = value.preview;
-		let category = value.category;
-		let stock = value.stock;
-		let price = value.price;
-		let expired = value.expired;
-
-		category == "General" ? (expired = "-") : expired;
-		expired == "" ? "-" : expired;
-
-		document.getElementById("list-data").innerHTML += `
-        <td>${index + 1}.</td>
-        <td>${name}</td>
-        <td>${sku}</td>
-        <td><img src="${preview}" alt="${name}" width="75px"></td>
-        <td>${category}</td>
-        <td>${stock}</td>
-        <td>IDR. ${parseInt(price).toLocaleString("id")}</td>
-        <td>${expired}</td>
-        <td>
-        <button type="button" onclick="editData('${sku}')">Edit</button>
-        <button type="button" onclick="deleteData('${sku}')">Delete</button>
-        </td>`;
-	});
+		if (v.sku == sku) {
+			return `
+			<tr>
+				<td>${i + 1}.</td>
+				<td><input id="edit-name" type="text" placeholder="${v.name}"></td>
+				<td>${v.sku}</td>
+				<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
+				<td>${v.category}</td>
+				<td><input id="edit-stock" type="number" placeholder="${v.stock}"></td>
+				<td><input id="edit-price" type="number" placeholder="${v.price}"></td>
+				<td>${v.expired}</td>
+				<td>
+				<button type="button" onclick="saveEdit('${v.sku}')">Save</button>
+				<button type="button" onclick="getFormValue(warehouse)">Cancel</button>
+				</td>
+			<tr>`;
+		} else {
+			return `
+			<tr>
+				<td>${i + 1}.</td>
+				<td>${v.name}</td>
+				<td>${v.sku}</td>
+				<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
+				<td>${v.category}</td>
+				<td>${v.stock}</td>
+				<td>IDR. ${parseInt(v.price).toLocaleString("id")}</td>
+				<td>${v.expired}</td>
+				<td>
+				<button type="button" onclick="editData('${v.sku}')">Edit</button>
+				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
+				</td>
+			<tr>`;
+		}
+	}).join("");
 };
 
 const handleSubmit = () => {
@@ -117,18 +127,7 @@ const filterProduct = () => {
 			if (value[inputKeys[i]] == inputValues[i]) {
 				check.push(true);
 				if (check.length == inputKeys.length) {
-					result.push(`
-						<td>${value.name}</td>
-						<td>${value.sku}</td>
-						<td><img src="${value.preview}" alt="${value.name}" width="75px"></td>
-						<td>${value.category}</td>
-						<td>${value.stock}</td>
-						<td>IDR. ${parseInt(value.price).toLocaleString("id")}</td>
-						<td>${value.expired ? value.expired : ""}</td>
-						<td>
-						<button type="button" onclick="editData('${value.sku}')">Edit</button>
-						<button type="button" onclick="deleteData('${value.sku}')">Delete</button>
-						</td>`);
+					result.push(value);
 				}
 			}
 		});
@@ -137,63 +136,23 @@ const filterProduct = () => {
 	if (result.length == 0) {
 		alert("Produk tidak ditemukan !");
 	} else {
-		result.forEach((v, i) => {
-			document.getElementById("list-data").innerHTML += `
-            <td>${i + 1}.</td>
-            ${v}`;
-		});
+		getFormValue(result);
 	}
 };
 
 const resetFilter = () => {
 	document.getElementById("filter").reset();
-	getFormValue();
+	getFormValue(warehouse);
 };
 
 const deleteData = (sku) => {
 	let index = warehouse.findIndex((val) => val.sku == sku);
 	warehouse.splice(index, 1);
-	getFormValue();
+	getFormValue(warehouse);
 };
 
 const editData = (sku) => {
-	document.getElementById("list-data").innerHTML = "";
-	let index = warehouse.findIndex((val) => val.sku == sku);
-
-	warehouse.forEach((v, i) => {
-		v.category == "General" ? (v.expired = "-") : v.expired;
-		v.expired == "" ? "-" : v.expired;
-
-		if (i == index) {
-			document.getElementById("list-data").innerHTML += `
-				<td>${i + 1}.</td>
-				<td><input id="edit-name" type="text" placeholder="${v.name}"></td>
-				<td>${v.sku}</td>
-				<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
-				<td>${v.category}</td>
-				<td><input id="edit-stock" type="number" placeholder="${v.stock}"></td>
-				<td><input id="edit-price" type="number" placeholder="${v.price}"></td>
-				<td>${v.expired}</td>
-				<td>
-				<button type="button" onclick="saveEdit('${v.sku}')">Save</button>
-				<button type="button" onclick="getFormValue()">Cancel</button>
-				</td>`;
-		} else {
-			document.getElementById("list-data").innerHTML += `
-				<td>${i + 1}.</td>
-				<td>${v.name}</td>
-				<td>${v.sku}</td>
-				<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
-				<td>${v.category}</td>
-				<td>${v.stock}</td>
-				<td>IDR. ${parseInt(v.price).toLocaleString("id")}</td>
-				<td>${v.expired}</td>
-				<td>
-				<button type="button" onclick="editData('${v.sku}')">Edit</button>
-				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
-				</td>`;
-		}
-	});
+	getFormValue(warehouse, sku);
 };
 
 const saveEdit = (sku) => {
@@ -201,5 +160,5 @@ const saveEdit = (sku) => {
 	document.getElementById("edit-name").value == "" ? "" : (warehouse[index].name = document.getElementById("edit-name").value);
 	document.getElementById("edit-stock").value == "" ? "" : (warehouse[index].stock = document.getElementById("edit-stock").value);
 	document.getElementById("edit-price").value == "" ? "" : (warehouse[index].price = document.getElementById("edit-price").value);
-	getFormValue();
+	getFormValue(warehouse);
 };
