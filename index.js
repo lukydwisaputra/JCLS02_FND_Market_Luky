@@ -48,7 +48,7 @@ const getFormValue = () => {
         <td>IDR. ${parseInt(price).toLocaleString("id")}</td>
         <td>${expired}</td>
         <td>
-        <button type="button" onclick="">Edit</button>
+        <button type="button" onclick="editData('${sku}')">Edit</button>
         <button type="button" onclick="deleteData('${sku}')">Delete</button>
         </td>`;
 	});
@@ -126,7 +126,7 @@ const filterProduct = () => {
                     <td>IDR. ${parseInt(value.price).toLocaleString("id")}</td>
                     <td>${value.expired ? value.expired : ""}</td>
 					<td>
-					<button type="button" onclick="">Edit</button>
+					<button type="button" onclick="editData(${value.sku})">Edit</button>
 					<button type="button" onclick="deleteData('${value.sku}')">Delete</button>
 					</td>`);
 				}
@@ -157,5 +157,50 @@ const deleteData = (sku) => {
 };
 
 const editData = (sku) => {
+	document.getElementById("list-data").innerHTML = "";
 	let index = warehouse.findIndex( val => val.sku == sku);
+
+	
+	warehouse.forEach((v, i) => {
+		v.category == "General" ? (v.expired = "-") : v.expired;
+		v.expired == "" ? "-" : v.expired;
+
+		if (i == index) {
+			document.getElementById("list-data").innerHTML += `
+				<td>${i + 1}.</td>
+				<td><input id="edit-name" type="text" placeholder="${v.name}"></td>
+				<td>${v.sku}</td>
+				<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
+				<td>${v.category}</td>
+				<td><input id="edit-stock" type="number" placeholder="${v.stock}"></td>
+				<td><input id="edit-price" type="number" placeholder="${v.price}"></td>
+				<td>${v.expired}</td>
+				<td>
+				<button type="button" onclick="saveEdit('${v.sku}')">Save</button>
+				<button type="button" onclick="getFormValue()">Cancel</button>
+				</td>`
+		} else {
+			document.getElementById("list-data").innerHTML += `
+				<td>${i + 1}.</td>
+				<td>${v.name}</td>
+				<td>${v.sku}</td>
+				<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
+				<td>${v.category}</td>
+				<td>${v.stock}</td>
+				<td>IDR. ${parseInt(v.price).toLocaleString("id")}</td>
+				<td>${v.expired}</td>
+				<td>
+				<button type="button" onclick="editData('${v.sku}')">Edit</button>
+				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
+				</td>`;
+		}
+	})
 };
+
+const saveEdit = (sku) => {
+	let index = warehouse.findIndex( val => val.sku == sku);
+	document.getElementById("edit-name").value == "" ? "" : warehouse[index].name = document.getElementById("edit-name").value;
+	document.getElementById("edit-stock").value == "" ? "" : warehouse[index].stock = document.getElementById("edit-stock").value;
+	document.getElementById("edit-price").value == "" ? "" : warehouse[index].price = document.getElementById("edit-price").value;
+	getFormValue();
+}
