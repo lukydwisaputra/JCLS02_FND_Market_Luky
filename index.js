@@ -24,12 +24,13 @@ warehouse.push(new FnB("Jus Kemasan", "SKU-2-123456", "https://img.my-best.id/pr
 warehouse.push(new FnB("Tomat", "SKU-3-123456", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/800px-Tomato_je.jpg", "FnB", 100, 750, "2022-07-24"));
 
 const getFormValue = (data, sku) => {
-	document.getElementById("list-data").innerHTML = data.map((v, i) => {
-		v.category == "General" ? (v.expired = "-") : v.expired;
-		v.expired == "" ? "-" : v.expired;
+	document.getElementById("list-data").innerHTML = data
+		.map((v, i) => {
+			v.category == "General" ? (v.expired = "-") : v.expired;
+			v.expired == "" ? "-" : v.expired;
 
-		if (v.sku == sku) {
-			return `
+			if (v.sku == sku) {
+				return `
 			<tr>
 				<td>${i + 1}.</td>
 				<td><input id="edit-name" type="text" placeholder="${v.name}"></td>
@@ -44,8 +45,8 @@ const getFormValue = (data, sku) => {
 				<button type="button" onclick="getFormValue(warehouse)">Cancel</button>
 				</td>
 			<tr>`;
-		} else {
-			return `
+			} else {
+				return `
 			<tr>
 				<td>${i + 1}.</td>
 				<td>${v.name}</td>
@@ -60,8 +61,9 @@ const getFormValue = (data, sku) => {
 				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
 				</td>
 			<tr>`;
-		}
-	}).join("");
+			}
+		})
+		.join("");
 };
 
 const handleSubmit = () => {
@@ -90,7 +92,7 @@ const handleSubmit = () => {
 		// reset form
 		document.getElementById("data-form").reset();
 
-		getFormValue();
+		getFormValue(warehouse);
 	}
 };
 
