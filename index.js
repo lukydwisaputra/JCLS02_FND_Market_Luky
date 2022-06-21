@@ -198,7 +198,7 @@ const decr = (sku) => {
 	} else {
 		cartList[cartListIndex].quantity -= 1;
 		warehouse[warehouseIndex].stock += 1;
-		
+
 		getFormValue(warehouse);
 		displayCartList();
 	}
@@ -240,7 +240,7 @@ const displayCartList = () => {
 		.map((v, i) => {
 			return `
 		<tr>
-			<td>${i + 1}.</td>
+			<td><input id="check-${v.sku}" type="checkbox"></td>
 			<td>${v.sku}</td>
 			<td><img src="${v.preview}" alt="${v.name}" width="75px"></td>
 			<td>${v.name}</td>
@@ -256,26 +256,38 @@ const displayCartList = () => {
 };
 
 const clearCart = () => {
-	cartList.forEach((v, i) => {
-		let quantity = v.quantity;
-		while (quantity > 0) {
-			decr(v.sku);
-			quantity -= 1;
+	let selectedItems = [];
+
+	cartList.forEach((v, i) => { 
+		if (document.getElementById(`check-${v.sku}`).checked) {
+			selectedItems.push(v);
 		}
-	});
-	cartList = [];
-	displayCartList();
+	})
+
+	if (selectedItems.length == 0) {
+		alert("Tidak ada produk yang dipilih..")
+	} else if (confirm("Hapus belanjaan yang dipilih ?")) {
+		selectedItems.forEach((value, index) => {
+			if (selectedItems[index].sku == value.sku) {
+				selectedItems.forEach(v => {
+					deleteCart(v.sku)
+				})
+			}
+		})
+	} 
+
+
+	getFormValue(warehouse);
+    displayCartList();
 };
 
 const deleteCart = (sku) => {
-	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+    let warehouseIndex = warehouse.findIndex((val) => val.sku == sku)
+    let cartListIndex = cartList.findIndex((val) => val.sku == sku);
 
-	while (cartList[cartListIndex].quantity > 0) {
-		decr(sku);
-	}
-
-	cartList.splice(cartListIndex, 1);
-
-	getFormValue(warehouse);
-	displayCartList();
+    warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity
+    cartList.splice(cartListIndex, 1);
+    getFormValue(warehouse);
+    displayCartList();
 };
+
