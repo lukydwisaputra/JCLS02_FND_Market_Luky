@@ -187,14 +187,20 @@ const saveEdit = (sku) => {
 const decr = (sku) => {
 	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
 	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
-
-	if (cartList[cartListIndex].quantity > 0) {
+	
+	if (cartList[cartListIndex].quantity == 1) {
 		cartList[cartListIndex].quantity -= 1;
 		warehouse[warehouseIndex].stock += 1;
+
+		deleteCart(sku);
 		getFormValue(warehouse);
 		displayCartList();
 	} else {
-		alert(`Quantity anda kosong!`);
+		cartList[cartListIndex].quantity -= 1;
+		warehouse[warehouseIndex].stock += 1;
+		
+		getFormValue(warehouse);
+		displayCartList();
 	}
 };
 
