@@ -1,6 +1,6 @@
 let warehouse = [];
+let cartList = [];
 let id = 3;
-
 class General {
 	constructor(name, sku, preview, category, stock, price) {
 		this.name = name;
@@ -11,11 +11,20 @@ class General {
 		this.price = price;
 	}
 }
-
 class FnB extends General {
 	constructor(name, sku, preview, category, stock, price, expired) {
 		super(name, sku, preview, category, stock, price);
 		this.expired = expired;
+	}
+}
+class Cart {
+	constructor(name, sku, preview, price, quantity) {
+		this.sku = sku;
+		this.preview = preview;
+		this.name = name;
+		this.price = price;
+		this.quantity = quantity;
+		this.subtotal = this.price * this.quantity;
 	}
 }
 
@@ -59,7 +68,7 @@ const getFormValue = (data, sku) => {
 				<td>
 				<button type="button" onclick="editData('${v.sku}')">Edit</button>
 				<button type="button" onclick="deleteData('${v.sku}')">Delete</button>
-				<button type="button" onclick="buyProduct('${v.sku}')">Beli</button>
+				<button type="button" onclick="buyProduct('${v.sku}')">Buy</button>
 				</td>
 			<tr>`;
 			}
@@ -165,27 +174,15 @@ const saveEdit = (sku) => {
 	document.getElementById("edit-name").value == "" ? "" : (warehouse[index].name = document.getElementById("edit-name").value);
 	document.getElementById("edit-stock").value == "" ? "" : (warehouse[index].stock = document.getElementById("edit-stock").value);
 	document.getElementById("edit-price").value == "" ? "" : (warehouse[index].price = document.getElementById("edit-price").value);
-	
+
 	// let name = document.getElementById("edit-name").value;
 	// let stock = document.getElementById("edit-stock").value;
 	// let price = document.getElementById("edit-price").value;
 
+	// spread operator -> right value overriding initial value
 	// warehouse[index] = {...warehouse[index], name, stock, price}
 	getFormValue(warehouse);
 };
-
-class Cart {
-	constructor(name, sku, preview, price, quantity) {
-		this.sku = sku;
-		this.preview = preview;
-		this.name = name;
-		this.price = price;
-		this.quantity = quantity;
-		this.subtotal = this.price * this.quantity;
-	}
-}
-
-let cartList = [];
 
 const decr = (sku) => {
 	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
@@ -221,14 +218,13 @@ const buyProduct = (sku) => {
 	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
 
 	let isEmptyCart = cartList.length == 0;
-	console.log(sku);
 
 	if (isEmptyCart || cartListIndex == -1) {
 		cartList.push(new Cart(warehouse[warehouseIndex].name, warehouse[warehouseIndex].sku, warehouse[warehouseIndex].preview, warehouse[warehouseIndex].price, 1));
 		warehouse[warehouseIndex].stock -= 1;
 		getFormValue(warehouse);
 		displayCartList();
-	} else if (cartListIndex != -1) {
+	} else if (cartListIndex >= 0) {
 		incr(sku);
 	}
 };
@@ -254,13 +250,13 @@ const displayCartList = () => {
 };
 
 const clearCart = () => {
-	cartList.forEach((v,i) => {
+	cartList.forEach((v, i) => {
 		let quantity = v.quantity;
 		while (quantity > 0) {
 			decr(v.sku);
 			quantity -= 1;
 		}
-	})
+	});
 	cartList = [];
 	displayCartList();
 };
@@ -268,10 +264,10 @@ const clearCart = () => {
 const deleteCart = (sku) => {
 	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
 	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
-	
-    warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity;
-    cartList.splice(cartListIndex, 1);
-	
-    getFormValue(warehouse);
-    displayCartList();
-}
+
+	warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity;
+	cartList.splice(cartListIndex, 1);
+
+	getFormValue(warehouse);
+	displayCartList();
+};
