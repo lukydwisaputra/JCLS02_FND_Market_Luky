@@ -262,10 +262,12 @@ const clearCart = () => {
 };
 
 const deleteCart = (sku) => {
-	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
 	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
 
-	warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity;
+	while (cartList[cartListIndex].quantity > 0) {
+		decr(sku);
+	}
+
 	cartList.splice(cartListIndex, 1);
 
 	getFormValue(warehouse);
