@@ -165,6 +165,12 @@ const saveEdit = (sku) => {
 	document.getElementById("edit-name").value == "" ? "" : (warehouse[index].name = document.getElementById("edit-name").value);
 	document.getElementById("edit-stock").value == "" ? "" : (warehouse[index].stock = document.getElementById("edit-stock").value);
 	document.getElementById("edit-price").value == "" ? "" : (warehouse[index].price = document.getElementById("edit-price").value);
+	
+	// let name = document.getElementById("edit-name").value;
+	// let stock = document.getElementById("edit-stock").value;
+	// let price = document.getElementById("edit-price").value;
+
+	// warehouse[index] = {...warehouse[index], name, stock, price}
 	getFormValue(warehouse);
 };
 
@@ -240,7 +246,7 @@ const displayCartList = () => {
 			<td><button type="button" onclick="decr('${v.sku}')">-</button> ${v.quantity} <button type="button" onclick="incr('${v.sku}')">+</button></td>
 			<td>IDR. ${(parseInt(v.price) * parseInt(v.quantity)).toLocaleString("id")} </td>
 			<td>
-			<button type="button" onclick="">Delete</button> 
+			<button type="button" onclick="deleteCart('${v.sku}')">Delete</button> 
 			</td>
 		<tr>`;
 		})
@@ -258,3 +264,14 @@ const clearCart = () => {
 	cartList = [];
 	displayCartList();
 };
+
+const deleteCart = (sku) => {
+	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
+	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+	
+    warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity;
+    cartList.splice(cartListIndex, 1);
+	
+    getFormValue(warehouse);
+    displayCartList();
+}
