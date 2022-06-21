@@ -258,7 +258,7 @@ const displayCartList = () => {
 const clearCart = () => {
 	let selectedItems = [];
 
-	cartList.forEach((v, i) => { 
+	cartList.forEach( v => { 
 		if (document.getElementById(`check-${v.sku}`).checked) {
 			selectedItems.push(v);
 		}
@@ -275,10 +275,6 @@ const clearCart = () => {
 			}
 		})
 	} 
-
-
-	getFormValue(warehouse);
-    displayCartList();
 };
 
 const deleteCart = (sku) => {
