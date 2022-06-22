@@ -32,14 +32,6 @@ class Cart {
 		this.subtotal = this.price * this.quantity;
 	}
 }
-class Report {
-	constructor(date, name, totalTransaction, isLogin) {
-		this.date = date;
-		this.name = name;
-		this.totalTransaction = totalTransaction;
-		this.isLogin = isLogin;
-	}
-}
 
 warehouse.push(new General("Topi", "SKU-1-456789", "https://www.jakartanotebook.com/images/products/95/63/27652/124/jiangxihuitian-topi-baseball-polos-xx2-black-with-white-side-141.jpg", "General", 15, 150000));
 warehouse.push(new FnB("Jus Kemasan", "SKU-2-123456", "https://img.my-best.id/press_component/images/22e63af38d2b1403aa0d7a78952107c8.jpg?ixlib=rails-4.2.0&q=70&lossless=0&w=690&fit=max", "FnB", 20, 15000, "2023-08-19"));
@@ -236,9 +228,9 @@ const buyProduct = (sku) => {
 	if (isLogin) {
 		let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
 		let cartListIndex = cartList.findIndex((val) => val.sku == sku);
-	
+
 		let isEmptyCart = cartList.length == 0;
-	
+
 		if (isEmptyCart || cartListIndex == -1) {
 			cartList.push(new Cart(warehouse[warehouseIndex].name, warehouse[warehouseIndex].sku, warehouse[warehouseIndex].preview, warehouse[warehouseIndex].price, 1));
 			warehouse[warehouseIndex].stock -= 1;
@@ -248,7 +240,7 @@ const buyProduct = (sku) => {
 			incr(sku);
 		}
 	} else {
-		alert("Silakan login terlebih dahulu")
+		alert("Silakan login terlebih dahulu");
 	}
 };
 
@@ -343,7 +335,6 @@ const handlePayment = () => {
 		let cashAmount = parseInt(document.getElementById("cash-amount").value);
 		console.log(cashAmount, totalPurchase);
 		if (cashAmount >= totalPurchase) {
-
 			let report = { user, totalPurchase };
 
 			reportList.push(report);
@@ -351,6 +342,14 @@ const handlePayment = () => {
 			displayReport();
 
 			alert(`Transaksi berhasil, kembalian anda adalah IDR. ${(cashAmount - totalPurchase).toLocaleString("id")}`);
+
+			// one user one time checkout
+			let confirmContinue = confirm("Lanjut berbelanja ?");
+			if (!confirmContinue) {
+				isLogin = false;
+				alert("Terimakasih sudah berbelanja..")
+			} 
+
 			handleCheckout();
 			checkoutList = [];
 			totalPurchase = 0;
@@ -387,19 +386,19 @@ const displayReport = () => {
 			<td>${i + 1}</td>
 			<td>${Date()}</td>
 			<td>${v.user}</td>
-			<td>IDR. ${parseInt(v.totalPurchase).toLocaleString('id')}</td>
+			<td>IDR. ${parseInt(v.totalPurchase).toLocaleString("id")}</td>
 		<tr>`;
-	}).join("");
+		})
+		.join("");
 
 	let omzet = 0;
-	reportList.forEach(v => {
+	reportList.forEach((v) => {
 		omzet += v.totalPurchase;
-	})
-	
-	document.getElementById("display-omzet").innerHTML = `<strong>OMZET : IDR. ${parseInt(omzet).toLocaleString('id')}</strong>`;
+	});
+
+	document.getElementById("display-omzet").innerHTML = `<strong>OMZET : IDR. ${parseInt(omzet).toLocaleString("id")}</strong>`;
 
 	document.getElementById("username").value = "";
 	document.getElementById("login-info").innerHTML = "";
 	user = "";
-	isLogin = false;
 };
