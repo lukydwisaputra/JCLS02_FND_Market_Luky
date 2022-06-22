@@ -1,5 +1,8 @@
 let warehouse = [];
 let cartList = [];
+let checkoutList = [];
+let userList = [];
+let totalPurchase = 0;
 let id = 3;
 class General {
 	constructor(name, sku, preview, category, stock, price) {
@@ -25,6 +28,14 @@ class Cart {
 		this.price = price;
 		this.quantity = quantity;
 		this.subtotal = this.price * this.quantity;
+	}
+}
+class Report {
+	constructor(date, name, totalTransaction, isLogin) {
+		this.date = date;
+		this.name = name;
+		this.totalTransaction = totalTransaction;
+		this.isLogin = isLogin;
 	}
 }
 
@@ -187,7 +198,7 @@ const saveEdit = (sku) => {
 const decr = (sku) => {
 	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
 	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
-	
+
 	if (cartList[cartListIndex].quantity == 1) {
 		cartList[cartListIndex].quantity -= 1;
 		warehouse[warehouseIndex].stock += 1;
@@ -258,30 +269,96 @@ const displayCartList = () => {
 const clearCart = () => {
 	let selectedItems = [];
 
-	cartList.forEach( v => { 
+	cartList.forEach((v) => {
 		if (document.getElementById(`check-${v.sku}`).checked) {
 			selectedItems.push(v);
 		}
-	})
+	});
 
 	if (selectedItems.length == 0) {
-		alert("Tidak ada produk yang dipilih..")
+		alert("Tidak ada produk yang dipilih..");
 	} else if (confirm("Hapus belanjaan yang dipilih ?")) {
-		selectedItems.forEach(() => {
-			selectedItems.forEach(v => {
-				deleteCart(v.sku)
-			})
-		})
-	} 
+		selectedItems.forEach((val, idx) => {
+			if (selectedItems[idx].sku == val.sku) {
+				selectedItems.forEach((v) => {
+					deleteCart(v.sku);
+				});
+			}
+		});
+	}
 };
 
 const deleteCart = (sku) => {
-    let warehouseIndex = warehouse.findIndex((val) => val.sku == sku)
-    let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
+	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
 
-    warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity
-    cartList.splice(cartListIndex, 1);
-    getFormValue(warehouse);
-    displayCartList();
+	warehouse[warehouseIndex].stock = warehouse[warehouseIndex].stock + cartList[cartListIndex].quantity;
+	cartList.splice(cartListIndex, 1);
+	getFormValue(warehouse);
+	displayCartList();
 };
 
+const handleCheckout = () => {
+	cartList.forEach((value) => {
+		if (document.getElementById(`check-${value.sku}`).checked) {
+			checkoutList.push(value);
+		}
+	});
+
+	document.getElementById("checkout-list").innerHTML = checkoutList
+		.map((v, i) => {
+			return `
+		<tr>
+		<td>${v.sku}</td>
+		<td>IDR. ${(parseInt(v.price) * parseInt(v.quantity)).toLocaleString("id")}</td>
+		<tr>`;
+		})
+		.join("");
+
+	checkoutList.forEach((v) => {
+		totalPurchase += parseInt(v.price) * parseInt(v.quantity);
+	});
+
+	document.getElementById("purchase-amount").innerHTML = `IDR. ${parseInt(totalPurchase).toLocaleString("id")},-`;
+
+	checkoutList.forEach((val, idx) => {
+		cartList.forEach((v, i) => {
+			if (val.sku == v.sku) {
+				cartList.splice(i, 1);
+				displayCartList();
+				getFormValue(warehouse);
+			}
+		});
+	});
+};
+
+const handlePayment = () => {
+	let cashAmount = parseInt(document.getElementById("cash-amount").value);
+	console.log(cashAmount, totalPurchase);
+	if (cashAmount >= totalPurchase) {
+		alert(`Transaksi berhasil, kembalian anda adalah IDR. ${(cashAmount - totalPurchase).toLocaleString("id")}`);
+		handleCheckout();
+		checkoutList = [];
+		totalPurchase = 0;
+		displayCartList();
+		document.getElementById("disp-payment-error").innerHTML = "";
+		document.getElementById("checkout-list").innerHTML = "";
+		document.getElementById("cash-amount").value = "";
+		document.getElementById("purchase-amount").innerHTML = "IDR. 0,-";
+	} else {
+		document.getElementById("disp-payment-error").innerHTML = `Total belanjaan anda IDR. ${totalPurchase.toLocaleString("id")},-. <br>Uang anda tidak cukup..`;
+	}
+};
+
+const handleLogin = () => {
+	let username = document.getElementById("username").value;
+	let _date = new Date();
+	let day = _date.getDate();
+	let month = _date.getMonth();
+	let year = _date.getFullYear();
+
+	let date = `${day}-${month}-${year}`;
+
+	userList.push(new User(username, 0, true));
+	console.log(userList);
+};
