@@ -267,12 +267,10 @@ const clearCart = () => {
 	if (selectedItems.length == 0) {
 		alert("Tidak ada produk yang dipilih..")
 	} else if (confirm("Hapus belanjaan yang dipilih ?")) {
-		selectedItems.forEach((value, index) => {
-			if (selectedItems[index].sku == value.sku) {
-				selectedItems.forEach(v => {
-					deleteCart(v.sku)
-				})
-			}
+		selectedItems.forEach(() => {
+			selectedItems.forEach(v => {
+				deleteCart(v.sku)
+			})
 		})
 	} 
 };
