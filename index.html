@@ -37,6 +37,13 @@
         </fieldset><br>
 
         <fieldset>
+            <legend><strong>Customer</strong></legend>
+            <input id="username" type="text" placeholder="Your Name">
+            <button type="button" onclick="handleLogin()">Login</button><br>
+            <p id="login-info"></p>
+        </fieldset><br>
+
+        <fieldset>
             <legend><strong>Filter</strong></legend>
             <form id="filter">
                 <input id="fil_name" type="text" placeholder="Product Name">
@@ -72,7 +79,8 @@
 
         <fieldset>
             <legend><strong>Cart List</strong></legend>
-            <button type="button" onclick="clearCart()">Delete Some Cart</button><br><br>
+            <button type="button" onclick="clearCart()">Delete Selected</button>
+            <button type="button" onclick="handleCheckout()">Checkout Selected</button><br><br>
             <table>
                 <thead>
                     <tr>
@@ -89,6 +97,54 @@
                 <tbody id="cart-list">
                 </tbody>
             </table>
+        </fieldset><br>
+
+        <fieldset>
+            <legend><strong>Checkout</strong></legend>
+            <table>
+                <thead>
+                    <tr>
+                         <th>SKU</th>
+                         <th>Sub. Total</th>
+                    </tr>
+                </thead>
+                <tbody id="checkout-list">
+                </tbody>
+            </table>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Total Pembayaran</th>
+                        <th id="purchase-amount">IDR. 0,-</th>
+                    </tr><br>
+                    <tr>
+                        <th>Uang Pembayaran</th>
+                        <th id="purchase"><input type="number" id="cash-amount">
+                            <button type="button" onclick="handlePayment()">Payment</button>
+                        </th>
+                        
+                    </tr>
+                </thead>
+            </table>
+            <h3 id="disp-payment-error"></h3>
+        </fieldset><br>
+
+        <fieldset>
+            <legend><strong>Report Transaction</strong></legend>
+            <table>
+                <thead>
+                    <tr>
+                         <th>No.</th>
+                         <th>Date</th>
+                         <th>User</th>
+                         <th>Total Transaction</th>
+                    </tr>
+                </thead>
+                <tbody id="report-table">
+                </tbody>
+            </table>
+            <p id="display-omzet"></p>
         </fieldset>
 
     </div>

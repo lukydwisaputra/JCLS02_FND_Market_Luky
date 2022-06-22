@@ -1,9 +1,11 @@
 let warehouse = [];
 let cartList = [];
 let checkoutList = [];
-let userList = [];
+let reportList = [];
 let totalPurchase = 0;
 let id = 3;
+let isLogin = false;
+let user = "";
 class General {
 	constructor(name, sku, preview, category, stock, price) {
 		this.name = name;
@@ -231,18 +233,22 @@ const incr = (sku) => {
 };
 
 const buyProduct = (sku) => {
-	let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
-	let cartListIndex = cartList.findIndex((val) => val.sku == sku);
-
-	let isEmptyCart = cartList.length == 0;
-
-	if (isEmptyCart || cartListIndex == -1) {
-		cartList.push(new Cart(warehouse[warehouseIndex].name, warehouse[warehouseIndex].sku, warehouse[warehouseIndex].preview, warehouse[warehouseIndex].price, 1));
-		warehouse[warehouseIndex].stock -= 1;
-		getFormValue(warehouse);
-		displayCartList();
-	} else if (cartListIndex >= 0) {
-		incr(sku);
+	if (isLogin) {
+		let warehouseIndex = warehouse.findIndex((val) => val.sku == sku);
+		let cartListIndex = cartList.findIndex((val) => val.sku == sku);
+	
+		let isEmptyCart = cartList.length == 0;
+	
+		if (isEmptyCart || cartListIndex == -1) {
+			cartList.push(new Cart(warehouse[warehouseIndex].name, warehouse[warehouseIndex].sku, warehouse[warehouseIndex].preview, warehouse[warehouseIndex].price, 1));
+			warehouse[warehouseIndex].stock -= 1;
+			getFormValue(warehouse);
+			displayCartList();
+		} else if (cartListIndex >= 0) {
+			incr(sku);
+		}
+	} else {
+		alert("Silakan login terlebih dahulu")
 	}
 };
 
@@ -333,32 +339,67 @@ const handleCheckout = () => {
 };
 
 const handlePayment = () => {
-	let cashAmount = parseInt(document.getElementById("cash-amount").value);
-	console.log(cashAmount, totalPurchase);
-	if (cashAmount >= totalPurchase) {
-		alert(`Transaksi berhasil, kembalian anda adalah IDR. ${(cashAmount - totalPurchase).toLocaleString("id")}`);
-		handleCheckout();
-		checkoutList = [];
-		totalPurchase = 0;
-		displayCartList();
-		document.getElementById("disp-payment-error").innerHTML = "";
-		document.getElementById("checkout-list").innerHTML = "";
-		document.getElementById("cash-amount").value = "";
-		document.getElementById("purchase-amount").innerHTML = "IDR. 0,-";
+	if (isLogin) {
+		let cashAmount = parseInt(document.getElementById("cash-amount").value);
+		console.log(cashAmount, totalPurchase);
+		if (cashAmount >= totalPurchase) {
+
+			let report = { user, totalPurchase };
+
+			reportList.push(report);
+			console.log(reportList);
+			displayReport();
+
+			alert(`Transaksi berhasil, kembalian anda adalah IDR. ${(cashAmount - totalPurchase).toLocaleString("id")}`);
+			handleCheckout();
+			checkoutList = [];
+			totalPurchase = 0;
+			displayCartList();
+			document.getElementById("disp-payment-error").innerHTML = "";
+			document.getElementById("checkout-list").innerHTML = "";
+			document.getElementById("cash-amount").value = "";
+			document.getElementById("purchase-amount").innerHTML = "IDR. 0,-";
+		} else {
+			document.getElementById("disp-payment-error").innerHTML = `Total belanjaan anda IDR. ${totalPurchase.toLocaleString("id")},-. <br>Uang anda tidak cukup..`;
+		}
 	} else {
-		document.getElementById("disp-payment-error").innerHTML = `Total belanjaan anda IDR. ${totalPurchase.toLocaleString("id")},-. <br>Uang anda tidak cukup..`;
+		alert("Silakan login terlebih dahulu");
 	}
 };
 
 const handleLogin = () => {
 	let username = document.getElementById("username").value;
-	let _date = new Date();
-	let day = _date.getDate();
-	let month = _date.getMonth();
-	let year = _date.getFullYear();
 
-	let date = `${day}-${month}-${year}`;
+	if (username && username != "") {
+		user = username;
+		isLogin = true;
+		document.getElementById("login-info").innerHTML = "<strong>Login berhasil..</strong>";
+	} else {
+		document.getElementById("login-info").innerHTML = "<strong>Login gagal, coba kembali..</strong>";
+	}
+};
 
-	userList.push(new User(username, 0, true));
-	console.log(userList);
+const displayReport = () => {
+	document.getElementById("report-table").innerHTML = reportList
+		.map((v, i) => {
+			return `
+		<tr>
+			<td>${i + 1}</td>
+			<td>${Date()}</td>
+			<td>${v.user}</td>
+			<td>IDR. ${parseInt(v.totalPurchase).toLocaleString('id')}</td>
+		<tr>`;
+	}).join("");
+
+	let omzet = 0;
+	reportList.forEach(v => {
+		omzet += v.totalPurchase;
+	})
+	
+	document.getElementById("display-omzet").innerHTML = `<strong>OMZET : IDR. ${parseInt(omzet).toLocaleString('id')}</strong>`;
+
+	document.getElementById("username").value = "";
+	document.getElementById("login-info").innerHTML = "";
+	user = "";
+	isLogin = false;
 };
