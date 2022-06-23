@@ -1,7 +1,9 @@
 let warehouse = [];
+
 let cartList = [];
 let checkoutList = [];
 let reportList = [];
+
 let totalPurchase = 0;
 let id = 3;
 let isLogin = false;
@@ -344,11 +346,12 @@ const handlePayment = () => {
 			alert(`Transaksi berhasil, kembalian anda adalah IDR. ${(cashAmount - totalPurchase).toLocaleString("id")}`);
 
 			// one user one time checkout
-			let confirmContinue = confirm("Lanjut berbelanja ?");
+			let confirmContinue = confirm("Pilih OK untuk lanjut berbelanja atau pilih CANCEL untuk logout..");
 			if (!confirmContinue) {
+				user = "";
 				isLogin = false;
-				alert("Terimakasih sudah berbelanja..")
-			} 
+				alert("Logout berhasil..\n\nTerimakasih sudah berbelanja..");
+			}
 
 			handleCheckout();
 			checkoutList = [];
@@ -400,5 +403,4 @@ const displayReport = () => {
 
 	document.getElementById("username").value = "";
 	document.getElementById("login-info").innerHTML = "";
-	user = "";
 };
